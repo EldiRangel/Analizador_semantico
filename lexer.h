@@ -1,5 +1,6 @@
 #ifndef LEXER_PROYECTO_H
 #define LEXER_PROYECTO_H
+
 #include <string>
 #include <unordered_map>
 
@@ -23,9 +24,9 @@ public:
 
 private:
     std::string stream_datos;
-    size_t cursor = 0;
-    int nro_linea = 1;
-    int nro_col = 1;
+    size_t cursor;
+    int nro_linea;
+    int nro_col;
 
     char ver_proximo() const;
     char extraer_char();
