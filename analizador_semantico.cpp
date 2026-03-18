@@ -1,10 +1,16 @@
 #include "analizador_semantico.h"
 
+// Agregamos esto para que reconozca string y los mapas
+using namespace std;
+
 AnalizadorSemantico::AnalizadorSemantico(const ArrayList<Token> &fuente_tokens) 
     : tokens_entrada(fuente_tokens) {}
 
 void AnalizadorSemantico::ejecutar_verificacion() {
     tabla_nombres.clear();
+    // Inicialización compatible con versiones antiguas
+    errores_detectados = ArrayList<DetalleError>(); 
+    
     procesar_bloque_variables();
     validar_tipos_datos();
     inspeccionar_controles();
@@ -29,12 +35,15 @@ void AnalizadorSemantico::procesar_bloque_variables() {
             }
             if (j < tokens_entrada.size() && tokens_entrada[j].value == ":") {
                 j++;
-                string tipo = tokens_entrada[j].value;
+                string tipo_leido = tokens_entrada[j].value;
                 for (size_t n = 0; n < nombres.size(); ++n) {
-                    if (tabla_nombres.count(nombres[n]))
-                        errores_detectados.add({tokens_entrada[i].line, tokens_entrada[i].column, "Variable duplicada: " + nombres[n]});
-                    else
-                        tabla_nombres[nombres[n]] = {tipo};
+                    if (tabla_nombres.count(nombres[n])) {
+                        DetalleError err = {tokens_entrada[i].line, tokens_entrada[i].column, "Variable duplicada: " + nombres[n]};
+                        errores_detectados.add(err);
+                    } else {
+                        RegistroSimbolo reg = {tipo_leido, true};
+                        tabla_nombres[nombres[n]] = reg;
+                    }
                 }
             }
             i = j;
@@ -45,18 +54,23 @@ void AnalizadorSemantico::procesar_bloque_variables() {
 void AnalizadorSemantico::validar_tipos_datos() {
     for (size_t i = 0; i < tokens_entrada.size(); ++i) {
         if (tokens_entrada[i].value == ":=") {
-            string var = tokens_entrada[i-1].value;
-            if (tabla_nombres.find(var) == tabla_nombres.end()) {
-                errores_detectados.add({tokens_entrada[i-1].line, tokens_entrada[i-1].column, "Variable no declarada: " + var});
+            string nombre_var = tokens_entrada[i-1].value;
+            if (tabla_nombres.find(nombre_var) == tabla_nombres.end()) {
+                DetalleError err = {tokens_entrada[i-1].line, tokens_entrada[i-1].column, "Variable no declarada: " + nombre_var};
+                errores_detectados.add(err);
                 continue;
             }
             string t_esp = detectar_tipo_token(tokens_entrada[i-1]);
             string t_real = detectar_tipo_token(tokens_entrada[i+1]);
 
-            if (t_esp == "integer" && t_real == "real")
-                errores_detectados.add({tokens_entrada[i+1].line, tokens_entrada[i+1].column, "Incompatibilidad: REAL a INTEGER"});
-            else if ((t_esp == "integer" || t_esp == "real") && t_real == "string")
-                errores_detectados.add({tokens_entrada[i+1].line, tokens_entrada[i+1].column, "Incompatibilidad: STRING a NUMERO"});
+            if (t_esp == "integer" && t_real == "real") {
+                DetalleError err = {tokens_entrada[i+1].line, tokens_entrada[i+1].column, "Incompatibilidad: REAL a INTEGER"};
+                errores_detectados.add(err);
+            }
+            else if ((t_esp == "integer" || t_esp == "real") && t_real == "string") {
+                DetalleError err = {tokens_entrada[i+1].line, tokens_entrada[i+1].column, "Incompatibilidad: STRING a NUMERO"};
+                errores_detectados.add(err);
+            }
         }
     }
 }
@@ -64,9 +78,11 @@ void AnalizadorSemantico::validar_tipos_datos() {
 void AnalizadorSemantico::inspeccionar_controles() {
     for (size_t i = 0; i < tokens_entrada.size(); ++i) {
         if (tokens_entrada[i].value == "if" || tokens_entrada[i].value == "while") {
-            string tipo = detectar_tipo_token(tokens_entrada[i+1]);
-            if (tipo != "boolean")
-                errores_detectados.add({tokens_entrada[i+1].line, tokens_entrada[i+1].column, "La condicion debe ser BOOLEAN"});
+            string t_cond = detectar_tipo_token(tokens_entrada[i+1]);
+            if (t_cond != "boolean") {
+                DetalleError err = {tokens_entrada[i+1].line, tokens_entrada[i+1].column, "La condicion debe ser BOOLEAN"};
+                errores_detectados.add(err);
+            }
         }
     }
 }
