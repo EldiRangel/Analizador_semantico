@@ -1,34 +1,28 @@
 var
-    x, y : integer;
-    promedio : real;
-    nombre : string;
-    esValido : boolean;
+    a, b : integer;
+    tasa : real;
+    mensaje : string;
+    a : integer;        
 
 begin
-    x := 10;
-    y := 20;
+    a := 10;
+    tasa := 5.5;
     
     
-    promedio := (x + y) / 2;
-    
-    nombre := "Proyecto Semantico";
-    esValido := true;
+    z := 100;
 
    
+    b := 7.25;
+
+   
+    tasa := "Costo Alto";
 
   
-    z := 5; 
-
-    
-    x := 3.14;
-
-    
-    y := x + nombre;
-
-    
-    if x then
         begin
-            x := x + 1;
+            a := a + 1;
         end;
 
+  
+    b := x + 10;
+    
 end.
