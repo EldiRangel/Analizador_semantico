@@ -25,12 +25,12 @@ int main() {
     sem.ejecutar_verificacion();
 
     if (sem.es_valido()) {
-        std::cout << "\n>>> ANALISIS EXITOSO: Sin errores semanticos.\n";
+        std::cout << "\n>>> EXITO: No hay errores semanticos.\n";
     } else {
         std::cout << "\n>>> ERRORES SEMANTICOS DETECTADOS:\n";
         const ArrayList<DetalleError>& errs = sem.obtener_lista_errores();
         for (size_t i = 0; i < errs.size(); ++i) {
-            std::cout << " [Fila " << errs[i].fila << ", Col " << errs[i].col << "] -> " << errs[i].mensaje_error << "\n";
+            std::cout << "  [Fila " << errs[i].fila << ", Col " << errs[i].col << "] -> " << errs[i].mensaje_error << "\n";
         }
     }
     return 0;
