@@ -23,9 +23,10 @@ void Lexer::initReservedWords() {
 
 void Lexer::limpiar_espacios() {
     while (cursor < stream_datos.length()) {
-        if (isspace(ver_proximo())) {
+        char c = ver_proximo();
+        if (isspace(c)) {
             extraer_char();
-        } else if (ver_proximo() == '/' && stream_datos[cursor + 1] == '/') {
+        } else if (c == '/' && stream_datos[cursor + 1] == '/') {
             while (cursor < stream_datos.length() && ver_proximo() != '\n') {
                 extraer_char();
             }
@@ -40,29 +41,30 @@ Token Lexer::nextToken() {
     if (cursor >= stream_datos.length()) return {TokenType::EndOfFile, "", nro_linea, nro_col};
 
     int l = nro_linea, c = nro_col;
-    char actual = extraer_char();
+    char actual = ver_proximo();
 
     if (isalpha(actual)) {
-        std::string palabra(1, actual);
+        std::string palabra = "";
         while (isalnum(ver_proximo())) palabra += extraer_char();
         if (mapa_palabras.count(palabra)) return {mapa_palabras[palabra], palabra, l, c};
         return {TokenType::Identifier, palabra, l, c};
     }
 
     if (isdigit(actual)) {
-        std::string num(1, actual);
+        std::string num = "";
         while (isdigit(ver_proximo()) || ver_proximo() == '.') num += extraer_char();
         return {TokenType::Number, num, l, c};
     }
 
     if (actual == '"') {
+        extraer_char(); // Quita "
         std::string cadena = "";
         while (ver_proximo() != '"' && ver_proximo() != '\0') cadena += extraer_char();
         if (ver_proximo() == '"') extraer_char();
         return {TokenType::String, cadena, l, c};
     }
 
-    std::string simb(1, actual);
+    std::string simb(1, extraer_char());
     if (simb == ":" && ver_proximo() == '=') {
         simb += extraer_char();
         return {TokenType::Operator, simb, l, c};
