@@ -1,7 +1,7 @@
 #ifndef ANALIZADOR_SEMANTICO_H
 #define ANALIZADOR_SEMANTICO_H
 
-#include "arraylist.h"
+#include "arraylist.h"      
 #include "lexer.h"
 #include <string>
 #include <unordered_map>
@@ -14,6 +14,7 @@ struct DetalleError {
 
 struct RegistroSimbolo {
     std::string tipo_dato;
+   
 };
 
 class AnalizadorSemantico {
@@ -25,7 +26,7 @@ public:
 
 private:
     const ArrayList<Token> &tokens_entrada;
-    std::unordered_map<std::string, RegistroSimbolo> tabla_nombres;
+    std::unordered_map<std::string, RegistroSimbolo> tabla_nombres; 
     ArrayList<DetalleError> errores_detectados;
 
     void procesar_bloque_variables();
