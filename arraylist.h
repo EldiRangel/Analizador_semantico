@@ -9,7 +9,6 @@ private:
     T* almacen;
     size_t tamanio;
     size_t capacidad_max;
-    size_t pos_lectura;
     
     void reubicar_memoria() {
         capacidad_max = (capacidad_max == 0) ? 1 : capacidad_max * 2;
@@ -22,19 +21,28 @@ private:
     }
     
 public:
-    ArrayList() : almacen(nullptr), tamanio(0), capacidad_max(0), pos_lectura(0) {
+    ArrayList() : almacen(nullptr), tamanio(0), capacidad_max(0) {
         reubicar_memoria();
     }
     
     ~ArrayList() { delete[] almacen; }
 
-    // Implementación de copia distinta a la original
     ArrayList(const ArrayList<T>& ref) {
         tamanio = ref.tamanio;
         capacidad_max = ref.capacidad_max;
-        pos_lectura = ref.pos_lectura;
         almacen = new T[capacidad_max];
         for(size_t i = 0; i < tamanio; i++) almacen[i] = ref.almacen[i];
+    }
+
+    ArrayList<T>& operator=(const ArrayList<T>& ref) {
+        if (this != &ref) {
+            delete[] almacen;
+            tamanio = ref.tamanio;
+            capacidad_max = ref.capacidad_max;
+            almacen = new T[capacidad_max];
+            for(size_t i = 0; i < tamanio; i++) almacen[i] = ref.almacen[i];
+        }
+        return *this;
     }
 
     void add(const T& objeto) {
@@ -43,12 +51,18 @@ public:
     }
 
     T& get(size_t indice) {
-        if (indice >= tamanio) throw std::out_of_range("Fuera de limites");
+        if (indice >= tamanio) throw std::out_of_range("Indice fuera de rango");
+        return almacen[indice];
+    }
+
+    const T& get(size_t indice) const {
+        if (indice >= tamanio) throw std::out_of_range("Indice fuera de rango");
         return almacen[indice];
     }
 
     size_t size() const { return tamanio; }
     T& operator[](size_t i) { return get(i); }
+    const T& operator[](size_t i) const { return get(i); }
 };
 
 #endif
